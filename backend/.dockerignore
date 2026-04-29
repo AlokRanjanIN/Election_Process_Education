@@ -1,0 +1,14 @@
+.coverage
+.env
+.env.*
+.gcloudignore
+.pytest_cache/
+.venv/
+__pycache__/
+*.log
+*.pyc
+*.pyo
+*.pyd
+htmlcov/
+tests/
+temp-key.json
