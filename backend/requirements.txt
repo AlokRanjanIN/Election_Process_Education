@@ -5,7 +5,7 @@ pydantic==2.5.2
 python-multipart==0.0.6
 
 # Google Cloud Services
-google-cloud-aiplatform>=1.50.0
+google-cloud-aiplatform>=1.149.0
 firebase-admin>=6.5.0
 google-cloud-firestore>=2.16.0
 google-cloud-translate>=3.16.0
