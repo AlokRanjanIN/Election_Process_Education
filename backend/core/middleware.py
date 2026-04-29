@@ -30,8 +30,10 @@ limiter = Limiter(
 )
 
 
-def handle_rate_limit_exceeded(request: Request, exc: RateLimitExceeded) -> JSONResponse:
+def handle_rate_limit_exceeded(request: Request, exc: Exception) -> JSONResponse:
     """Return 429 with clear message when rate limit is hit."""
+    if not isinstance(exc, RateLimitExceeded):
+        logger.warning("Unexpected exception type in rate-limit handler: %s", type(exc))
     logger.warning(
         "Rate limit exceeded: ip=%s, path=%s",
         get_remote_address(request),
@@ -52,6 +54,23 @@ async def request_logging_middleware(request: Request, call_next: Callable) -> R
     start_time = time.time()
     response: Response = await call_next(request)
     duration_ms = (time.time() - start_time) * 1000
+
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault(
+        "Permissions-Policy",
+        "camera=(), microphone=(self), geolocation=()",
+    )
+    response.headers.setdefault(
+        "Content-Security-Policy",
+        "default-src 'self'; frame-ancestors 'none'; base-uri 'self'",
+    )
+    if settings.ENVIRONMENT.lower() == "production":
+        response.headers.setdefault(
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains",
+        )
 
     # Do NOT log raw query payloads for privacy (plan.md: No-Logging Policy for RAG)
     logger.info(

@@ -85,7 +85,10 @@ export async function getGuideNextStep(currentState: string = 'INIT'): Promise<G
   return response.data
 }
 
-export async function getTimeline(stateCode: string, constituencyId?: string): Promise<TimelineResponse[]> {
+export async function getTimeline(
+  stateCode: string,
+  constituencyId?: string,
+): Promise<TimelineResponse[]> {
   const params: Record<string, string> = { state_code: stateCode }
   if (constituencyId) params.constituency_id = constituencyId
   const response = await apiClient.get<TimelineResponse[]>('/api/v1/timeline', { params })

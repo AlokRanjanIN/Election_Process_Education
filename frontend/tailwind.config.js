@@ -35,10 +35,10 @@ export default {
         sans: ['Inter', 'Noto Sans Devanagari', 'system-ui', 'sans-serif'],
       },
       minWidth: {
-        'mobile': '320px',
+        mobile: '320px',
       },
       spacing: {
-        'touch': '48px',
+        touch: '48px',
       },
     },
   },

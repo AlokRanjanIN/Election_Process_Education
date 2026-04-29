@@ -1,27 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { evaluateEligibility, EligibilityResponse } from '../api/client'
-
-const STATES = [
-  { code: 'AN', name: 'Andaman & Nicobar' }, { code: 'AP', name: 'Andhra Pradesh' },
-  { code: 'AR', name: 'Arunachal Pradesh' }, { code: 'AS', name: 'Assam' },
-  { code: 'BR', name: 'Bihar' }, { code: 'CH', name: 'Chandigarh' },
-  { code: 'CT', name: 'Chhattisgarh' }, { code: 'DD', name: 'Daman & Diu' },
-  { code: 'DL', name: 'Delhi' }, { code: 'GA', name: 'Goa' },
-  { code: 'GJ', name: 'Gujarat' }, { code: 'HP', name: 'Himachal Pradesh' },
-  { code: 'HR', name: 'Haryana' }, { code: 'JH', name: 'Jharkhand' },
-  { code: 'JK', name: 'Jammu & Kashmir' }, { code: 'KA', name: 'Karnataka' },
-  { code: 'KL', name: 'Kerala' }, { code: 'LA', name: 'Ladakh' },
-  { code: 'LD', name: 'Lakshadweep' }, { code: 'MH', name: 'Maharashtra' },
-  { code: 'ML', name: 'Meghalaya' }, { code: 'MN', name: 'Manipur' },
-  { code: 'MP', name: 'Madhya Pradesh' }, { code: 'MZ', name: 'Mizoram' },
-  { code: 'NL', name: 'Nagaland' }, { code: 'OD', name: 'Odisha' },
-  { code: 'PB', name: 'Punjab' }, { code: 'PY', name: 'Puducherry' },
-  { code: 'RJ', name: 'Rajasthan' }, { code: 'SK', name: 'Sikkim' },
-  { code: 'TN', name: 'Tamil Nadu' }, { code: 'TG', name: 'Telangana' },
-  { code: 'TR', name: 'Tripura' }, { code: 'UK', name: 'Uttarakhand' },
-  { code: 'UP', name: 'Uttar Pradesh' }, { code: 'WB', name: 'West Bengal' },
-]
+import { INDIAN_STATES } from '../constants/states'
 
 export default function EligibilityPage() {
   const { t } = useTranslation()
@@ -79,16 +59,20 @@ export default function EligibilityPage() {
 
         {/* Citizenship */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div id="citizen-label" className="block text-sm font-semibold text-gray-700 mb-2">
             {t('eligibility.citizen')}
-          </label>
-          <div className="flex gap-4">
+          </div>
+          <div className="flex gap-4" role="radiogroup" aria-labelledby="citizen-label">
             <button
               type="button"
               id="citizen-yes"
               onClick={() => setIsCitizen(true)}
+              role="radio"
+              aria-checked={isCitizen}
               className={`flex-1 py-3 rounded-lg font-medium transition-colors ${
-                isCitizen ? 'bg-primary-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                isCitizen
+                  ? 'bg-primary-700 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               {t('eligibility.yes')}
@@ -97,8 +81,12 @@ export default function EligibilityPage() {
               type="button"
               id="citizen-no"
               onClick={() => setIsCitizen(false)}
+              role="radio"
+              aria-checked={!isCitizen}
               className={`flex-1 py-3 rounded-lg font-medium transition-colors ${
-                !isCitizen ? 'bg-primary-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                !isCitizen
+                  ? 'bg-primary-700 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               {t('eligibility.no')}
@@ -119,22 +107,26 @@ export default function EligibilityPage() {
             className="input-field"
           >
             <option value="">-- {t('timeline.state')} --</option>
-            {STATES.map((s) => (
-              <option key={s.code} value={s.code}>{s.name} ({s.code})</option>
+            {INDIAN_STATES.map((s) => (
+              <option key={s.code} value={s.code}>
+                {s.name} ({s.code})
+              </option>
             ))}
           </select>
         </div>
 
         {/* NRI Status */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div id="nri-label" className="block text-sm font-semibold text-gray-700 mb-2">
             {t('eligibility.nri')}
-          </label>
-          <div className="flex gap-4">
+          </div>
+          <div className="flex gap-4" role="radiogroup" aria-labelledby="nri-label">
             <button
               type="button"
               id="nri-yes"
               onClick={() => setIsNri(true)}
+              role="radio"
+              aria-checked={isNri}
               className={`flex-1 py-3 rounded-lg font-medium transition-colors ${
                 isNri ? 'bg-primary-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
@@ -145,6 +137,8 @@ export default function EligibilityPage() {
               type="button"
               id="nri-no"
               onClick={() => setIsNri(false)}
+              role="radio"
+              aria-checked={!isNri}
               className={`flex-1 py-3 rounded-lg font-medium transition-colors ${
                 !isNri ? 'bg-primary-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
@@ -160,33 +154,44 @@ export default function EligibilityPage() {
           disabled={loading || !dob || !state}
           className="btn-primary w-full flex items-center justify-center gap-2"
         >
-          {loading && <span className="spinner" />}
+          {loading && <span className="spinner" aria-hidden="true" />}
           {t('eligibility.check')}
         </button>
       </form>
 
       {/* Error */}
       {error && (
-        <div className="mt-6 status-ineligible animate-slide-up" id="eligibility-error">
-          ⚠️ {error}
+        <div
+          className="mt-6 status-ineligible animate-slide-up"
+          id="eligibility-error"
+          role="alert"
+        >
+          <span aria-hidden="true">⚠️</span> {error}
         </div>
       )}
 
       {/* Result */}
       {result && (
-        <div className={`mt-6 animate-slide-up ${result.eligible ? 'status-eligible' : 'status-ineligible'}`} id="eligibility-result">
+        <div
+          className={`mt-6 animate-slide-up ${result.eligible ? 'status-eligible' : 'status-ineligible'}`}
+          id="eligibility-result"
+          role="status"
+          aria-live="polite"
+        >
           <p className="text-lg font-bold mb-2">
-            {result.eligible ? `✅ ${t('eligibility.eligible')}` : `❌ ${t('eligibility.not_eligible')}`}
+            <span aria-hidden="true">{result.eligible ? '✅' : '❌'}</span>{' '}
+            {result.eligible ? t('eligibility.eligible') : t('eligibility.not_eligible')}
           </p>
           {result.required_form && (
             <p className="mb-2">
-              <span className="font-semibold">{t('eligibility.form_required')}:</span> {result.required_form}
+              <span className="font-semibold">{t('eligibility.form_required')}:</span>{' '}
+              {result.required_form}
             </p>
           )}
           <p className="text-sm">{result.reasoning}</p>
           {result.eligible_from_year && (
             <p className="mt-2 text-sm font-medium">
-              📅 Eligible from: {result.eligible_from_year}
+              <span aria-hidden="true">📅</span> Eligible from: {result.eligible_from_year}
             </p>
           )}
         </div>

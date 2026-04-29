@@ -19,7 +19,9 @@ to allow tests to run without GCP dependencies installed.
 
 import json
 import logging
-from typing import List, Optional, Tuple
+from typing import List, Tuple, TypedDict
+
+from starlette.concurrency import run_in_threadpool
 
 from core.config import settings
 from models.faq import FAQResponse, Citation
@@ -28,6 +30,17 @@ logger = logging.getLogger(__name__)
 
 # --- Vertex AI initialization flag ---
 _vertex_initialized: bool = False
+_embedding_model = None
+_generative_model = None
+
+
+class ContextDocument(TypedDict):
+    """Retrieved ECI document used for grounded answer generation."""
+
+    id: str
+    title: str
+    content: str
+    url: str
 
 # --- Grounded system prompt template ---
 SYSTEM_PROMPT = """You are the Indian Election Process Education Assistant. Your ONLY purpose is to provide accurate information about the Indian election process based on verified Election Commission of India (ECI) documents.
@@ -107,10 +120,16 @@ def generate_embedding(text: str) -> List[float]:
     """
     _ensure_vertex_initialized()
 
-    from vertexai.language_models import TextEmbeddingModel
+    global _embedding_model
 
-    model = TextEmbeddingModel.from_pretrained(settings.VERTEX_EMBEDDING_MODEL)
-    embeddings = model.get_embeddings([text])
+    if _embedding_model is None:
+        from vertexai.language_models import TextEmbeddingModel
+
+        _embedding_model = TextEmbeddingModel.from_pretrained(
+            settings.VERTEX_EMBEDDING_MODEL
+        )
+
+    embeddings = _embedding_model.get_embeddings([text])
 
     if not embeddings:
         logger.error("Empty embedding returned for text: %s", text[:50])
@@ -121,8 +140,8 @@ def generate_embedding(text: str) -> List[float]:
 
 def vector_search_firestore(
     query_embedding: List[float],
-    top_k: int = None,
-) -> List[dict]:
+    top_k: int | None = None,
+) -> List[ContextDocument]:
     """
     Execute nearest-neighbor vector search against Firestore eci_vector_docs.
 
@@ -154,7 +173,7 @@ def vector_search_firestore(
         limit=top_k,
     )
 
-    results = []
+    results: List[ContextDocument] = []
     for doc in vector_query.stream():
         data = doc.to_dict()
         results.append({
@@ -168,7 +187,7 @@ def vector_search_firestore(
     return results
 
 
-def build_grounded_prompt(query: str, context_docs: List[dict]) -> str:
+def build_grounded_prompt(query: str, context_docs: List[ContextDocument]) -> str:
     """
     Construct a grounded prompt with retrieved context wrapped in <context> XML tags.
 
@@ -205,9 +224,14 @@ def invoke_llm(prompt: str) -> str:
     """
     _ensure_vertex_initialized()
 
-    from vertexai.generative_models import GenerativeModel, GenerationConfig
+    global _generative_model
 
-    model = GenerativeModel(settings.VERTEX_LLM_MODEL)
+    from vertexai.generative_models import GenerationConfig
+
+    if _generative_model is None:
+        from vertexai.generative_models import GenerativeModel
+
+        _generative_model = GenerativeModel(settings.VERTEX_LLM_MODEL)
 
     generation_config = GenerationConfig(
         temperature=settings.VERTEX_LLM_TEMPERATURE,
@@ -216,7 +240,7 @@ def invoke_llm(prompt: str) -> str:
         top_k=40,
     )
 
-    response = model.generate_content(
+    response = _generative_model.generate_content(
         prompt,
         generation_config=generation_config,
     )
@@ -269,17 +293,17 @@ async def ask_faq(query: str, locale: str = "en-IN") -> FAQResponse:
     Returns:
         FAQResponse with grounded answer and citations.
     """
-    logger.info("RAG pipeline invoked: query='%s', locale=%s", query[:50], locale)
+    logger.info("RAG pipeline invoked: locale=%s", locale)
 
     try:
         # Step 1: Generate query embedding
-        query_embedding = generate_embedding(query)
+        query_embedding = await run_in_threadpool(generate_embedding, query)
         if not query_embedding:
             logger.error("Failed to generate embedding for query.")
             return NO_CONTEXT_RESPONSE
 
         # Step 2: Vector search against Firestore
-        context_docs = vector_search_firestore(query_embedding)
+        context_docs = await run_in_threadpool(vector_search_firestore, query_embedding)
 
         # Step 3: Check if we have relevant context
         if not context_docs:
@@ -290,7 +314,7 @@ async def ask_faq(query: str, locale: str = "en-IN") -> FAQResponse:
         prompt = build_grounded_prompt(query, context_docs)
 
         # Step 5: Invoke LLM
-        raw_response = invoke_llm(prompt)
+        raw_response = await run_in_threadpool(invoke_llm, prompt)
 
         # Step 6: Parse response
         answer, citations = parse_llm_response(raw_response)

@@ -1,10 +1,12 @@
+import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import EligibilityPage from './components/EligibilityPage'
-import GuidePage from './components/GuidePage'
-import TimelinePage from './components/TimelinePage'
-import FAQPage from './components/FAQPage'
-import HomePage from './components/HomePage'
+
+const EligibilityPage = lazy(() => import('./components/EligibilityPage'))
+const GuidePage = lazy(() => import('./components/GuidePage'))
+const TimelinePage = lazy(() => import('./components/TimelinePage'))
+const FAQPage = lazy(() => import('./components/FAQPage'))
+const HomePage = lazy(() => import('./components/HomePage'))
 
 function NavBar() {
   const { t, i18n } = useTranslation()
@@ -29,7 +31,9 @@ function NavBar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 font-bold text-lg min-h-0">
-            <span className="text-2xl">🗳️</span>
+            <span className="text-2xl" aria-hidden="true">
+              🗳️
+            </span>
             <span className="hidden sm:inline">{t('app.title')}</span>
           </Link>
 
@@ -40,10 +44,12 @@ function NavBar() {
                 key={link.path}
                 to={link.path}
                 id={link.id}
+                aria-current={location.pathname === link.path ? 'page' : undefined}
                 className={`px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors min-h-0
-                  ${location.pathname === link.path
-                    ? 'bg-primary-700 text-white'
-                    : 'text-primary-200 hover:bg-primary-800 hover:text-white'
+                  ${
+                    location.pathname === link.path
+                      ? 'bg-primary-700 text-white'
+                      : 'text-primary-200 hover:bg-primary-800 hover:text-white'
                   }`}
               >
                 {link.label}
@@ -87,13 +93,21 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-gray-50">
         <NavBar />
         <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/eligibility" element={<EligibilityPage />} />
-            <Route path="/guide" element={<GuidePage />} />
-            <Route path="/timeline" element={<TimelinePage />} />
-            <Route path="/faq" element={<FAQPage />} />
-          </Routes>
+          <Suspense
+            fallback={
+              <div className="max-w-6xl mx-auto px-4 py-8 text-gray-600" role="status">
+                Loading...
+              </div>
+            }
+          >
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/eligibility" element={<EligibilityPage />} />
+              <Route path="/guide" element={<GuidePage />} />
+              <Route path="/timeline" element={<TimelinePage />} />
+              <Route path="/faq" element={<FAQPage />} />
+            </Routes>
+          </Suspense>
         </main>
         <Footer />
       </div>

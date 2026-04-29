@@ -24,8 +24,8 @@ body {
 /* --- Accessibility: Touch Targets --- */
 button,
 a,
-[role="button"],
-input[type="submit"] {
+[role='button'],
+input[type='submit'] {
   min-height: 48px;
   min-width: 48px;
 }
@@ -90,8 +90,14 @@ input[type="submit"] {
 
 /* --- Animations --- */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
@@ -99,8 +105,14 @@ input[type="submit"] {
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-slide-up {
@@ -109,7 +121,9 @@ input[type="submit"] {
 
 /* --- Loading Spinner --- */
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner {
