@@ -1,0 +1,12 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '--build-arg', 'VITE_API_BASE_URL=${_VITE_API_BASE_URL}',
+    '-t', 'gcr.io/${PROJECT_ID}/election-web',
+    '.'
+  ]
+images:
+- 'gcr.io/${PROJECT_ID}/election-web'
+substitutions:
+  _VITE_API_BASE_URL: ''

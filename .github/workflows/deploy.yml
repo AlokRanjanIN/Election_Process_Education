@@ -1,0 +1,113 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: asia-south1
+  SERVICE_NAME: election-api
+  IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/election-api
+
+jobs:
+  # --- Job 1: Run Tests ---
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        run: pytest tests/ -v --cov=. --cov-report=term-missing --cov-fail-under=70
+        env:
+          ENVIRONMENT: testing
+          GCP_PROJECT_ID: test-project
+          GCP_LOCATION: us-central1
+
+  # --- Job 2: Build and Deploy (only on main branch push) ---
+  deploy:
+    name: Build & Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.IMAGE_NAME }}:${{ github.sha }} -t ${{ env.IMAGE_NAME }}:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.IMAGE_NAME }}:latest
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          flags: >-
+            --allow-unauthenticated
+            --memory=1024Mi
+            --cpu=1
+            --min-instances=0
+            --max-instances=100
+            --concurrency=80
+            --cpu-throttling
+          env_vars: |
+            GCP_PROJECT_ID=${{ env.PROJECT_ID }}
+            GCP_LOCATION=${{ env.REGION }}
+            ENVIRONMENT=production
+
+      - name: Verify deployment
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --format "value(status.url)")
+          echo "Service URL: ${SERVICE_URL}"
+          curl -s "${SERVICE_URL}/health" | python -m json.tool

@@ -1,0 +1,65 @@
+{
+  "app": {
+    "title": "Election Guide India",
+    "subtitle": "Your guide to the Indian election process",
+    "tagline": "Verified information from the Election Commission of India"
+  },
+  "nav": {
+    "home": "Home",
+    "eligibility": "Check Eligibility",
+    "guide": "Registration Guide",
+    "timeline": "Election Timeline",
+    "faq": "Ask a Question"
+  },
+  "eligibility": {
+    "title": "Check Your Voter Eligibility",
+    "description": "Find out if you're eligible to vote and which form you need.",
+    "dob": "Date of Birth",
+    "citizen": "Are you an Indian citizen?",
+    "state": "State of Residence",
+    "nri": "Are you an NRI (Non-Resident Indian)?",
+    "check": "Check Eligibility",
+    "eligible": "You are eligible to vote!",
+    "not_eligible": "You are not eligible to vote at this time.",
+    "form_required": "Required Form",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "guide": {
+    "title": "Step-by-Step Registration Guide",
+    "description": "We'll walk you through the voter registration process.",
+    "start": "Start Registration Guide",
+    "next": "Next Step",
+    "previous": "Previous Step",
+    "step": "Step {{current}} of {{total}}",
+    "complete": "Registration Complete!",
+    "useful_links": "Useful Links"
+  },
+  "timeline": {
+    "title": "Election Timeline",
+    "description": "View upcoming election dates for your constituency.",
+    "state": "Select State",
+    "constituency": "Constituency ID (optional)",
+    "search": "Search Timeline",
+    "no_results": "No timeline data found for this region.",
+    "events": "Election Events"
+  },
+  "faq": {
+    "title": "Ask About Elections",
+    "description": "Get verified answers about the Indian election process.",
+    "placeholder": "Type your question about voting, registration, or elections...",
+    "ask": "Ask Question",
+    "sources": "Sources",
+    "powered_by": "Powered by verified ECI documents",
+    "voice_input": "Speak your question",
+    "voice_output": "Listen to answer"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "back": "Back",
+    "submit": "Submit",
+    "language": "Language",
+    "helpline": "Voter Helpline: 1950"
+  }
+}

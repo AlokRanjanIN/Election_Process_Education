@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Voter Registration - Form 6 Guidelines",
+    "content": "Form 6 is used for inclusion of name in the electoral roll. Any Indian citizen who has attained the age of 18 years on the qualifying date (1st January of the year of revision of electoral roll) can apply for registration as a voter. The applicant must be a resident of the constituency where registration is sought. Required documents include: (1) Proof of Age - Birth certificate, School leaving certificate, Indian Passport, PAN card, or Aadhaar card; (2) Proof of Address - Ration card, utility bills (water, electricity, gas), Bank/Post Office passbook, Aadhaar card, or Government-issued photo ID. The filled form along with copies of supporting documents should be submitted to the Electoral Registration Officer (ERO) of the constituency.",
+    "url": "https://voters.eci.gov.in/forms/form6"
+  },
+  {
+    "title": "NRI Voter Registration - Form 6A",
+    "content": "Form 6A is specifically designed for overseas (NRI) electors. An overseas elector is a citizen of India who has not acquired citizenship of any other country and is absenting from the place of ordinary residence in India owing to employment, education, or otherwise outside India (whether temporarily or not). NRI voters can register in the constituency where their place of residence in India as mentioned in the passport is located. Required documents: (1) Self-attested copy of valid Indian Passport; (2) Valid visa/immigration stamp with overseas residence proof. NRI voters can vote in person at the designated polling station; postal ballot facility is also available for overseas electors.",
+    "url": "https://voters.eci.gov.in/forms/form6a"
+  },
+  {
+    "title": "Voter ID Card (EPIC) Replacement",
+    "content": "If your Voter ID card (EPIC - Electors Photo Identity Card) is lost, damaged, or stolen, you can apply for a duplicate by submitting Form 002 at your local Electoral Registration Office (ERO). Required documents: (1) FIR copy or affidavit in case of loss/theft; (2) Old voter ID number if available; (3) Two passport-size photographs; (4) Proof of address. You can also apply online through the National Voters' Service Portal (NVSP) at www.nvsp.in. The processing time is typically 15-30 working days.",
+    "url": "https://voters.eci.gov.in/epic-replacement"
+  },
+  {
+    "title": "Voting Rights for Persons with Disabilities (PwD)",
+    "content": "The Election Commission of India is committed to ensuring accessible elections for Persons with Disabilities (PwD). Key provisions include: (1) Companion Voter: PwD voters who are unable to record their vote without assistance can take a companion of at least 18 years of age to the polling booth. The companion must carry a valid ID and signs a declaration of secrecy; (2) Accessible Polling Stations: All polling stations should have ramp access, wheelchair availability, and signage in Braille; (3) Priority Entry: PwD voters along with pregnant women and senior citizens above 80 years are entitled to priority entry at polling stations; (4) Braille-enabled EVMs: Braille signage on EVM buttons helps visually impaired voters identify candidates; (5) Postal Ballot: PwD voters with benchmark disability of 40% or more can opt for postal ballot facility.",
+    "url": "https://eci.gov.in/pwd-guidelines"
+  },
+  {
+    "title": "Senior Citizen Voting - Form 12D Postal Ballot",
+    "content": "Senior citizens aged 85 years and above, and Persons with Disabilities (PwD) with 40% or more benchmark disability, are eligible to vote from home through postal ballot. The process involves: (1) The voter must fill out Form 12D within 5 days of the election notification; (2) Submit the form to the Returning Officer (RO) of the constituency; (3) A team consisting of a Polling Officer and a representative will visit the voter's home on a designated date; (4) The voter can cast their vote in the presence of the team; (5) The postal ballot is then sealed and collected by the team for counting. Note: The voter must have a valid entry in the electoral roll. Application through Form 12D can be submitted online via NVSP or offline at the ERO office.",
+    "url": "https://eci.gov.in/absentee-voters"
+  },
+  {
+    "title": "Election Day Procedures and Voting Process",
+    "content": "On Election Day, the following procedures are followed: (1) Polling stations open at 7:00 AM and close at 6:00 PM (timings may vary for some regions); (2) Voters must carry a valid photo ID (EPIC, Aadhaar, Passport, DL, PAN, etc.) to the polling station; (3) Upon arrival, the voter's identity is verified against the electoral roll; (4) Indelible ink is applied to the left index finger; (5) The voter enters the voting compartment and presses the button on the EVM (Electronic Voting Machine) next to their chosen candidate's name and symbol; (6) The VVPAT (Voter Verifiable Paper Audit Trail) displays the vote cast for 7 seconds for verification; (7) After voting, the voter exits through the designated door. Important: No mobile phones, cameras, or electronic devices are allowed inside the polling booth. Violation of polling rules is punishable under the Representation of the People Act, 1951.",
+    "url": "https://eci.gov.in/voting-procedures"
+  },
+  {
+    "title": "Electoral Roll and Qualifying Date",
+    "content": "The Electoral Roll is a list of all persons registered to vote in a particular constituency. The qualifying date for inclusion in the electoral roll is 1st January of the year of revision. This means that if you turn 18 on or before 1st January of a given year, you are eligible to register as a voter for that year's roll. The Electoral Roll is revised annually through Summary Revision. Citizens can check their name in the electoral roll by: (1) Visiting the CEO (Chief Electoral Officer) website of their state; (2) Using the Electoral Search feature on electoralsearch.eci.gov.in; (3) Sending an SMS with EPIC number to 1950; (4) Using the Voter Helpline App. If your name is missing, you can apply for inclusion using Form 6.",
+    "url": "https://eci.gov.in/electoral-roll"
+  },
+  {
+    "title": "Corrections in Voter ID - Form 8",
+    "content": "Form 8 is used for correction of entries in the electoral roll. If there are errors in your voter ID details such as name spelling, age, address, photograph, or gender, you can submit Form 8 to get these corrected. The form can be submitted: (1) Online through the NVSP portal (www.nvsp.in); (2) Directly to the ERO office of your constituency; (3) Through the Voter Helpline App. Required supporting documents include a valid ID proof showing the correct details. Processing time is 15-30 working days. Multiple corrections can be requested in a single Form 8 submission.",
+    "url": "https://voters.eci.gov.in/forms/form8"
+  },
+  {
+    "title": "Transfer of Voter Registration - Form 6",
+    "content": "If you have shifted your residence to a new constituency, you need to apply for a fresh registration in the new constituency using Form 6. The process involves: (1) Fill Form 6 with your new address details; (2) Provide proof of new address (utility bills, rent agreement, Aadhaar with updated address); (3) Submit to the ERO of the new constituency; (4) Your name will be added to the new electoral roll after verification; (5) Your name will be automatically deleted from the old constituency's roll. Note: You can only be registered in one constituency at a time. Dual registration is an offence under Section 17 of the Representation of the People Act, 1950.",
+    "url": "https://voters.eci.gov.in/forms/form6-transfer"
+  },
+  {
+    "title": "Model Code of Conduct During Elections",
+    "content": "The Model Code of Conduct (MCC) comes into force from the date of announcement of elections by the Election Commission. Key rules for voters: (1) No one can distribute cash, liquor, or gifts to influence votes - this is a criminal offence; (2) Report any violations to the ECI through the cVIGIL app; (3) The MCC does not restrict voters from exercising their right to vote freely; (4) Voters should not be influenced by caste, religion, or monetary considerations; (5) Any attempt to prevent a voter from casting their vote is a punishable offence. The Model Code remains in force until the completion of the election process and announcement of results.",
+    "url": "https://eci.gov.in/mcc"
+  },
+  {
+    "title": "NOTA - None of the Above Option",
+    "content": "NOTA (None of the Above) is an option available on EVMs (Electronic Voting Machines) that allows voters to officially reject all candidates. Introduced by the Supreme Court of India in 2013, NOTA is represented by a ballot symbol. Key points: (1) NOTA votes are counted but do not affect the election outcome - the candidate with the most votes wins regardless of NOTA count; (2) Exercising NOTA is a valid democratic right; (3) NOTA maintains voter secrecy as it appears as a regular vote on the EVM; (4) The NOTA option appears at the bottom of the candidate list on the EVM.",
+    "url": "https://eci.gov.in/nota"
+  },
+  {
+    "title": "Election Phases and Multi-Phase Polling",
+    "content": "In large states, elections are often conducted in multiple phases to ensure adequate security and administrative coverage. Key points: (1) The number of phases is decided by the Election Commission based on security assessment; (2) Different constituencies within a state may vote on different dates; (3) Re-polling may be ordered in specific booths if irregularities are found; (4) Results for all phases are announced on a single counting day; (5) The election schedule including phase-wise dates is published by the ECI and available on eci.gov.in. Voters must vote only in the phase designated for their constituency.",
+    "url": "https://eci.gov.in/election-phases"
+  }
+]
