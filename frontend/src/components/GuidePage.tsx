@@ -66,10 +66,10 @@ export default function GuidePage() {
           {/* Progress Bar */}
           <div className="mb-6">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>
+              <span aria-live="polite">
                 {t('guide.step', { current: guide.step_number, total: guide.total_steps })}
               </span>
-              <span className="badge-info">{guide.current_state.replace(/_/g, ' ')}</span>
+              <span className="badge-info" aria-live="polite">{guide.current_state.replace(/_/g, ' ')}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div

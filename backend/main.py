@@ -18,6 +18,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from slowapi.errors import RateLimitExceeded
 from core.config import settings
 from core.middleware import configure_middleware
 from models.common import HealthResponse, ErrorResponse
@@ -53,7 +54,7 @@ app.add_middleware(
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["*"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept"],
     max_age=3600,
 )
 
@@ -115,6 +116,18 @@ async def root():
 
 
 # --- Global Exception Handlers ---
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    """Return 429 when rate limit is exceeded."""
+    return JSONResponse(
+        status_code=429,
+        content={
+            "error": "rate_limit_exceeded",
+            "message": "Too many requests. Please try again later.",
+            "retry_after": "60s"
+        },
+    )
+
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
     """Custom 404 handler."""
@@ -126,8 +139,8 @@ async def not_found_handler(request: Request, exc):
         },
     )
 
-
 @app.exception_handler(422)
+@app.exception_handler(ValueError)
 async def validation_error_handler(request: Request, exc):
     """Custom validation error handler with user-friendly messages."""
     return JSONResponse(
@@ -135,10 +148,9 @@ async def validation_error_handler(request: Request, exc):
         content={
             "error": "validation_error",
             "message": "Invalid request data. Please check your input and try again.",
-            "details": str(exc.detail) if hasattr(exc, "detail") else str(exc),
+            "details": str(exc)
         },
     )
-
 
 @app.exception_handler(500)
 async def internal_error_handler(request: Request, exc):

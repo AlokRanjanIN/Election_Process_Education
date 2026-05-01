@@ -1,6 +1,8 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import ErrorBoundary from './components/ErrorBoundary'
+import { usePageMetadata } from './hooks/usePageMetadata'
 
 const EligibilityPage = lazy(() => import('./components/EligibilityPage'))
 const GuidePage = lazy(() => import('./components/GuidePage'))
@@ -87,16 +89,19 @@ function Footer() {
   )
 }
 
-export default function App() {
+function AppContent() {
+  const { t } = useTranslation()
+  usePageMetadata()
+
   return (
-    <BrowserRouter>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <NavBar />
-        <main className="flex-grow">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <NavBar />
+      <main id="main-content" className="flex-grow focus:outline-none" tabIndex={-1}>
+        <ErrorBoundary>
           <Suspense
             fallback={
               <div className="max-w-6xl mx-auto px-4 py-8 text-gray-600" role="status">
-                Loading...
+                {t('common.loading')}
               </div>
             }
           >
@@ -108,9 +113,26 @@ export default function App() {
               <Route path="/faq" element={<FAQPage />} />
             </Routes>
           </Suspense>
-        </main>
-        <Footer />
-      </div>
+        </ErrorBoundary>
+      </main>
+      <Footer />
+    </div>
+  )
+}
+
+export default function App() {
+  const { t, i18n } = useTranslation()
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language
+  }, [i18n.language])
+
+  return (
+    <BrowserRouter>
+      <a href="#main-content" className="skip-link">
+        {t('common.skip_to_main')}
+      </a>
+      <AppContent />
     </BrowserRouter>
   )
 }

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import EligibilityPage from '../components/EligibilityPage'
 import { evaluateEligibility } from '../api/client'
@@ -29,11 +29,13 @@ describe('EligibilityPage', () => {
     await user.selectOptions(screen.getByLabelText(/state of residence/i), 'MH')
     await user.click(screen.getByRole('button', { name: /check eligibility/i }))
 
-    expect(mockedEvaluateEligibility).toHaveBeenCalledWith({
-      dob: '2000-01-01',
-      is_citizen: true,
-      state_of_residence: 'MH',
-      is_nri: false,
+    await waitFor(() => {
+      expect(mockedEvaluateEligibility).toHaveBeenCalledWith({
+        dob: '2000-01-01',
+        is_citizen: true,
+        state_of_residence: 'MH',
+        is_nri: false,
+      })
     })
     expect(await screen.findByRole('status')).toHaveTextContent(/eligible to vote/i)
   })

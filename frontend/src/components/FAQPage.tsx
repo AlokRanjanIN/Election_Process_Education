@@ -1,80 +1,36 @@
 import { useState, FormEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { askFAQ, FAQResponse } from '../api/client'
-
-interface SpeechRecognitionResultEvent extends Event {
-  results: SpeechRecognitionResultList
-}
-
-interface BrowserSpeechRecognition extends EventTarget {
-  lang: string
-  interimResults: boolean
-  onresult: ((event: SpeechRecognitionResultEvent) => void) | null
-  start: () => void
-}
-
-interface SpeechRecognitionConstructor {
-  new (): BrowserSpeechRecognition
-}
-
-interface WindowWithSpeechRecognition extends Window {
-  SpeechRecognition?: SpeechRecognitionConstructor
-  webkitSpeechRecognition?: SpeechRecognitionConstructor
-}
+import { useFAQ } from '../hooks/useFAQ'
+import { useSpeech } from '../hooks/useSpeech'
 
 export default function FAQPage() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [query, setQuery] = useState('')
-  const [result, setResult] = useState<FAQResponse | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const locale = i18n.language === 'hi' ? 'hi-IN' : 'en-IN'
+  const { result, loading, error, handleAsk, resetFAQ } = useFAQ()
+  const { startVoiceInput, readAloud } = useSpeech()
+  const resultRef = useRef<HTMLDivElement>(null)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!query.trim()) return
-    setLoading(true)
-    setError('')
-    setResult(null)
-
-    try {
-      const response = await askFAQ({ query: query.trim(), locale })
-      setResult(response)
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : t('common.error')
-      setError(errorMsg)
-    } finally {
-      setLoading(false)
-    }
+    await handleAsk(query)
+    // Small delay to allow DOM to update
+    setTimeout(() => {
+      resultRef.current?.focus()
+    }, 100)
   }
 
-  // --- Web Speech API: Voice Input ---
   const handleVoiceInput = () => {
-    const speechWindow = window as WindowWithSpeechRecognition
-    const SpeechRecognition = speechWindow.webkitSpeechRecognition || speechWindow.SpeechRecognition
-    if (!SpeechRecognition) {
-      alert('Voice input is not supported in this browser.')
-      return
-    }
-    const recognition = new SpeechRecognition()
-    recognition.lang = locale
-    recognition.interimResults = false
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript
+    startVoiceInput((transcript) => {
       setQuery(transcript)
-    }
-    recognition.start()
+    })
   }
 
-  // --- Web Speech API: Text-to-Speech ---
   const handleReadAloud = () => {
-    if (!result?.answer) return
-    const utterance = new SpeechSynthesisUtterance(result.answer)
-    utterance.lang = locale
-    utterance.rate = 0.9
-    speechSynthesis.speak(utterance)
+    if (result?.answer) {
+      readAloud(result.answer)
+    }
   }
 
   return (
@@ -92,9 +48,10 @@ export default function FAQPage() {
             placeholder={t('faq.placeholder')}
             aria-label={t('faq.placeholder')}
             maxLength={300}
-            rows={3}
             className="input-field resize-none pr-12"
             required
+            aria-invalid={!!error}
+            aria-describedby={error ? "faq-error" : undefined}
           />
           <span className="absolute bottom-3 right-3 text-xs text-gray-400" aria-hidden="true">
             {query.length}/300
@@ -106,6 +63,8 @@ export default function FAQPage() {
             type="submit"
             id="ask-faq-btn"
             disabled={loading || !query.trim()}
+            aria-disabled={loading || !query.trim()}
+            aria-controls="faq-result"
             className="btn-primary flex-1 flex items-center justify-center gap-2"
           >
             {loading && <span className="spinner" aria-hidden="true" />}
@@ -128,14 +87,16 @@ export default function FAQPage() {
       </form>
 
       {error && (
-        <div className="status-ineligible animate-slide-up" id="faq-error" role="alert">
+        <div className="status-ineligible animate-slide-up" id="faq-error" role="alert" tabIndex={-1}>
           <span aria-hidden="true">⚠️</span> {error}
         </div>
       )}
 
       {result && (
         <div
-          className="animate-slide-up space-y-4"
+          ref={resultRef}
+          tabIndex={-1}
+          className="animate-slide-up space-y-4 focus:outline-none"
           id="faq-result"
           role="status"
           aria-live="polite"

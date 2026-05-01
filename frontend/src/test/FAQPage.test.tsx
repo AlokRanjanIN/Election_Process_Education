@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import FAQPage from '../components/FAQPage'
 import { askFAQ } from '../api/client'
@@ -27,9 +27,11 @@ describe('FAQPage', () => {
     await user.type(screen.getByLabelText(/type your question/i), 'How do I register?')
     await user.click(screen.getByRole('button', { name: /ask question/i }))
 
-    expect(mockedAskFAQ).toHaveBeenCalledWith({
-      query: 'How do I register?',
-      locale: 'en-IN',
+    await waitFor(() => {
+      expect(mockedAskFAQ).toHaveBeenCalledWith({
+        query: 'How do I register?',
+        locale: 'en-IN',
+      })
     })
     expect(await screen.findByRole('status')).toHaveTextContent(/register online/i)
     expect(screen.getByRole('link', { name: /eci voter registration/i })).toHaveAttribute(

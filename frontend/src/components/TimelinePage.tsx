@@ -1,41 +1,18 @@
 import { useState, FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getTimeline, TimelineResponse } from '../api/client'
+import { useTimeline } from '../hooks/useTimeline'
 import { INDIAN_STATES } from '../constants/states'
 
 export default function TimelinePage() {
   const { t } = useTranslation()
   const [stateCode, setStateCode] = useState('')
   const [constituencyId, setConstituencyId] = useState('')
-  const [timelines, setTimelines] = useState<TimelineResponse[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [searched, setSearched] = useState(false)
+
+  const { timelines, loading, error, searched, fetchTimeline } = useTimeline()
 
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setError('')
-    setSearched(true)
-
-    try {
-      const results = await getTimeline(stateCode, constituencyId || undefined)
-      setTimelines(results)
-    } catch (err: unknown) {
-      setTimelines([])
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosErr = err as { response?: { status?: number } }
-        if (axiosErr.response?.status === 404) {
-          setError(t('timeline.no_results'))
-        } else {
-          setError(t('common.error'))
-        }
-      } else {
-        setError(t('common.error'))
-      }
-    } finally {
-      setLoading(false)
-    }
+    fetchTimeline(stateCode, constituencyId || undefined)
   }
 
   const formatDate = (dateStr: string) => {
@@ -67,6 +44,8 @@ export default function TimelinePage() {
             onChange={(e) => setStateCode(e.target.value)}
             required
             className="input-field"
+            aria-invalid={!!error}
+            aria-describedby={error ? "timeline-error" : undefined}
           >
             <option value="">-- {t('timeline.state')} --</option>
             {INDIAN_STATES.map((s) => (
@@ -98,6 +77,8 @@ export default function TimelinePage() {
           type="submit"
           id="search-timeline-btn"
           disabled={loading || !stateCode}
+          aria-disabled={loading || !stateCode}
+          aria-controls="timeline-results"
           className="btn-primary w-full flex items-center justify-center gap-2"
         >
           {loading && <span className="spinner" aria-hidden="true" />}

@@ -8,7 +8,9 @@ plan.md API Design Section 3:
 import logging
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request, Depends
+from google.cloud.firestore_v1.client import Client as FirestoreClient
+from core.deps import get_db
 
 from core.config import settings
 from core.middleware import limiter
@@ -36,6 +38,7 @@ router = APIRouter(prefix="/api/v1/timeline", tags=["Timeline"])
 @limiter.limit(settings.RATE_LIMIT_TIMELINE)
 async def fetch_timeline(
     request: Request,
+    db: FirestoreClient = Depends(get_db),
     state_code: str = Query(
         ...,
         min_length=2,
@@ -71,6 +74,7 @@ async def fetch_timeline(
 
     try:
         results = await get_timeline(
+            db=db,
             state_code=state_upper,
             constituency_id=constituency_id.upper().strip() if constituency_id else None,
         )

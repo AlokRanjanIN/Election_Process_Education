@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import TimelinePage from '../components/TimelinePage'
 import { getTimeline } from '../api/client'
@@ -28,7 +28,9 @@ describe('TimelinePage', () => {
     await user.selectOptions(screen.getByLabelText(/select state/i), 'MH')
     await user.click(screen.getByRole('button', { name: /search timeline/i }))
 
-    expect(mockedGetTimeline).toHaveBeenCalledWith('MH', undefined)
+    await waitFor(() => {
+      expect(mockedGetTimeline).toHaveBeenCalledWith('MH', undefined)
+    })
     expect(await screen.findByRole('status')).toHaveTextContent(/polling day/i)
     expect(screen.getByText('MH-23')).toBeInTheDocument()
   })

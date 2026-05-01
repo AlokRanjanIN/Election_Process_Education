@@ -57,6 +57,9 @@ async def request_logging_middleware(request: Request, call_next: Callable) -> R
 
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("X-XSS-Protection", "1; mode=block")
+    response.headers.setdefault("Cache-Control", "no-store, max-age=0")
+    response.headers.setdefault("Pragma", "no-cache")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault(
         "Permissions-Policy",

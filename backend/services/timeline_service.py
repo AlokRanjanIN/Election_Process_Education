@@ -8,7 +8,7 @@ constituency_id, as specified in plan.md database schema.
 import logging
 import time
 from typing import List, Optional
-
+from google.cloud.firestore_v1.client import Client as FirestoreClient
 from starlette.concurrency import run_in_threadpool
 
 from core.config import settings
@@ -21,6 +21,7 @@ _timeline_cache: dict[tuple[str, Optional[str]], tuple[float, List[TimelineRespo
 
 
 async def get_timeline(
+    db: FirestoreClient,
     state_code: str,
     constituency_id: Optional[str] = None,
 ) -> List[TimelineResponse]:
@@ -50,6 +51,7 @@ async def get_timeline(
 
     results = await run_in_threadpool(
         _fetch_timeline_from_firestore,
+        db,
         state_upper,
         constituency_upper,
     )
@@ -61,6 +63,7 @@ async def get_timeline(
 
 
 def _fetch_timeline_from_firestore(
+    db: FirestoreClient,
     state_code: str,
     constituency_id: Optional[str] = None,
 ) -> List[TimelineResponse]:
@@ -72,9 +75,6 @@ def _fetch_timeline_from_firestore(
     )
 
     from google.cloud.firestore_v1.base_query import FieldFilter
-    from core.firebase import get_firestore_client
-
-    db = get_firestore_client()
     collection_ref = db.collection(settings.COLLECTION_TIMELINES)
 
     # Build query with filters

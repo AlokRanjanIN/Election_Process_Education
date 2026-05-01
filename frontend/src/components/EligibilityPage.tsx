@@ -1,6 +1,6 @@
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { evaluateEligibility, EligibilityResponse } from '../api/client'
+import { useEligibility } from '../hooks/useEligibility'
 import { INDIAN_STATES } from '../constants/states'
 
 export default function EligibilityPage() {
@@ -9,30 +9,21 @@ export default function EligibilityPage() {
   const [isCitizen, setIsCitizen] = useState(true)
   const [state, setState] = useState('')
   const [isNri, setIsNri] = useState(false)
-  const [result, setResult] = useState<EligibilityResponse | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+
+  const { result, loading, error, checkEligibility } = useEligibility()
+  const resultRef = useRef<HTMLDivElement>(null)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setError('')
-    setResult(null)
-    setLoading(true)
-
-    try {
-      const response = await evaluateEligibility({
-        dob,
-        is_citizen: isCitizen,
-        state_of_residence: state,
-        is_nri: isNri,
-      })
-      setResult(response)
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : t('common.error')
-      setError(errorMsg)
-    } finally {
-      setLoading(false)
-    }
+    await checkEligibility({
+      dob,
+      is_citizen: isCitizen,
+      state_of_residence: state,
+      is_nri: isNri,
+    })
+    setTimeout(() => {
+      resultRef.current?.focus()
+    }, 100)
   }
 
   return (
@@ -54,6 +45,8 @@ export default function EligibilityPage() {
             required
             max={new Date().toISOString().split('T')[0]}
             className="input-field"
+            aria-invalid={!!error}
+            aria-describedby={error ? "eligibility-error" : undefined}
           />
         </div>
 
@@ -105,6 +98,8 @@ export default function EligibilityPage() {
             onChange={(e) => setState(e.target.value)}
             required
             className="input-field"
+            aria-invalid={!!error}
+            aria-describedby={error ? "eligibility-error" : undefined}
           >
             <option value="">-- {t('timeline.state')} --</option>
             {INDIAN_STATES.map((s) => (
@@ -152,6 +147,8 @@ export default function EligibilityPage() {
           type="submit"
           id="check-eligibility-btn"
           disabled={loading || !dob || !state}
+          aria-disabled={loading || !dob || !state}
+          aria-controls="eligibility-result"
           className="btn-primary w-full flex items-center justify-center gap-2"
         >
           {loading && <span className="spinner" aria-hidden="true" />}
@@ -173,7 +170,9 @@ export default function EligibilityPage() {
       {/* Result */}
       {result && (
         <div
-          className={`mt-6 animate-slide-up ${result.eligible ? 'status-eligible' : 'status-ineligible'}`}
+          ref={resultRef}
+          tabIndex={-1}
+          className={`mt-6 animate-slide-up focus:outline-none ${result.eligible ? 'status-eligible' : 'status-ineligible'}`}
           id="eligibility-result"
           role="status"
           aria-live="polite"

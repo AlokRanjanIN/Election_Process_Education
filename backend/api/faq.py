@@ -15,8 +15,9 @@ Implements full security pipeline:
 
 import logging
 
-from fastapi import APIRouter, HTTPException, Request
-
+from fastapi import APIRouter, HTTPException, Request, Depends
+from google.cloud.firestore_v1.client import Client as FirestoreClient
+from core.deps import get_db
 from core.config import settings
 from core.middleware import limiter
 from core.security import (
@@ -60,7 +61,7 @@ BLOCKED_RESPONSE = FAQResponse(
     "All responses are grounded in official ECI documents with mandatory citations.",
 )
 @limiter.limit(settings.RATE_LIMIT_FAQ)
-async def ask(request: Request, body: FAQRequest) -> FAQResponse:
+async def ask(request: Request, body: FAQRequest, db: FirestoreClient = Depends(get_db)) -> FAQResponse:
     """
     Process a user question through the full security + RAG pipeline.
 
@@ -107,7 +108,7 @@ async def ask(request: Request, body: FAQRequest) -> FAQResponse:
 
     # --- Step 6: Run RAG pipeline ---
     try:
-        result = await ask_faq(english_query, body.locale)
+        result = await ask_faq(db, english_query, body.locale)
     except Exception as e:
         logger.exception("RAG pipeline error: %s", e)
         raise HTTPException(
