@@ -9,7 +9,7 @@ python-multipart==0.0.26
 google-cloud-aiplatform==1.149.0
 firebase-admin==6.5.0
 google-cloud-firestore==2.16.0
-google-cloud-translate==3.16.0
+google-cloud-translate==3.26.0
 
 # Security & Rate Limiting
 slowapi==0.1.9
